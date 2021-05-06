@@ -1,0 +1,8 @@
+numpy
+tensorflow
+tensorflow_hub
+protobuf
+matplotlib
+pillow
+requests
+opencv-python

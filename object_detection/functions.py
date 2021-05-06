@@ -35,11 +35,9 @@ def cut_threshold(detection: dict, threshold: float = math.inf, count: int = mat
 def plot_object_detection(img: Image, predict: np.ndarray, **kwargs):
     color = list((CSS4_COLORS.keys()))
     random.shuffle(color)
-    img_plot = img.pil_image
-    width = img_plot.width
-    height = img_plot.height
+    height, width, _ = img.size
     fig, ax = plt.subplots(**kwargs)
-    ax.imshow(img_plot)
+    ax.imshow(img.array)
 
     patch_list = list()
     for box, cls, color in zip(
