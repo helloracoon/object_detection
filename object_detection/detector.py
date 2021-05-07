@@ -120,16 +120,12 @@ class TfDefaultDetector:
         # input_tensor = np.expand_dims(image_np, 0)
         detections = self._model(input_tensor)
 
-        # All outputs are batches tensors.
-        # Convert to numpy arrays, and take index [0] to remove the batch dimension.
-        # We're only interested in the first num_detections.
         num_detections = int(detections.pop("num_detections"))
         detections = {
             key: value[0, :num_detections].numpy() for key, value in detections.items()
         }
         detections["num_detections"] = num_detections
 
-        # detection_classes should be ints.
         detections["detection_classes"] = detections["detection_classes"].astype(
             np.int64
         )

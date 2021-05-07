@@ -6,3 +6,5 @@ matplotlib
 pillow
 requests
 opencv-python
+pafy
+youtube-dl
