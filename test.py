@@ -87,7 +87,7 @@ def test_video():
 
 
 def test_youtube():
-    video = pafy.new('https://youtu.be/m4KzIFQVN1w').getbest()
+    video = pafy.new('https://youtu.be/VEA0a6gOydo').getbest()
     detector = TfDefaultDetector("ssd_mobilenet_v2/fpnlite_320x320/1", "mscoco_label_map.pbtxt")
     detector.initialize()
     
@@ -95,8 +95,8 @@ def test_youtube():
     
     # CV2 Setup
     cap = cv2.VideoCapture(video.url)
-    fps = 15
-    cap.set(fps, 0)
+    # fps = 15
+    # cap.set(fps, 0)
     while True:
         ret_val, img = cap.read()
         if ret_val is False:
@@ -108,16 +108,16 @@ def test_youtube():
             item["name"]: color
             for item, color in zip(detector.category_map.values(), RANDOM_COLORS)
         }
-        # predict_person = filter_predict(predict, 'person')
+        # predict = filter_predict(predict, 'person')
         predict_cut = cut_threshold(predict, 0.5)
         rectangles = get_object_patch(image, predict_cut)
-        
+
         for rectangle in rectangles:
             x, y = list(int(xy) for xy in rectangle.get_xy())
             width = int(rectangle.get_width())
             height = int(rectangle.get_height())
             color = color_map[rectangle.get_label()]
-            
+
             color = tuple(list(color * 255 for color in to_rgb(color)))
             label = rectangle.get_label()
             img = cv2.rectangle(
@@ -128,7 +128,7 @@ def test_youtube():
                 3,
             )
             cv2.putText(
-                img, label, (x - 2, y - 2), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2
+                img, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2
             )
         cv2.imshow(title, img)
         

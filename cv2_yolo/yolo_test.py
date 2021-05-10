@@ -2,6 +2,7 @@ import cv2
 import urllib3
 from urllib.parse import urlparse
 import os
+import numpy as np
 
 
 cfg = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg"
@@ -33,10 +34,37 @@ for yolo_file in [cfg, weights]:
                 data = file.read(CHUNK_SIZE)
                 if not data:
                     break
-            out.write(data)
+                out.write(data)
 
     model_path[file_name] = file_path
 
 
-dnn_model = cv2.dnn.readNet(model_path.get("yolov3.weigths"), model_path.get("yolov3.cfg"))
-dnn_model
+coco_names = manager.request('GET','https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names', preload_content=False)
+classes = [coco.decode('utf-8').rstrip() for coco in coco_names.readlines()]
+colors = np.random.uniform(0, 255, size=(len(classes), 3))
+
+net = cv2.dnn.readNet(model_path.get("yolov3.weigths"), model_path.get("yolov3.cfg"))
+layer_names = net.getLayerNames()
+output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+img = cv2.imread("/Users/helloracoon/Downloads/AKR20201207106900005_01_i_P4.jpg")
+height, width, channels = img.shape
+blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+net.setInput(blob)
+outs = net.forward(output_layers)
+
+
+#
+# dnn_model = cv2.dnn.readNet(model_path.get("yolov3.weigths"), model_path.get("yolov3.cfg"))
+# layer_names = dnn_model.getLayerNames()
+# output_layers = [layer_names[i[0] - 1] for i in dnn_model.getUnconnectedOutLayers()]
+#
+#
+#
+#
+# #
+# if __name__ == '__main__':
+#
+#     image = cv2.imread(filename='/Users/helloracoon/Downloads/AKR20201207106900005_01_i_P4.jpg')
+#     blob = cv2.dnn.blobFromImage(image)
+#     dnn_model.setInput(blob)
+#     dnn_model.forward(output_layers)

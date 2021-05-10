@@ -14,25 +14,35 @@ RANDOM_COLORS = list((CSS4_COLORS.keys()))
 random.shuffle(RANDOM_COLORS)
 
 
-def filter_predict(detection: dict, name):
-
+def filter_predict(detection: dict, name: list):
+    if name is None:
+        return detection
     filtered_detection = dict()
 
     filtered_list = [
-        i for i, d in enumerate(detection["detection_classes"]) if d["name"] == name
+        i for i, d in enumerate(detection["detection_classes"]) if d["name"] in name
     ]
+    if not filtered_detection:
+        return None
 
     for key in detection.keys():
         if not hasattr(detection[key], "__getitem__"):
             filtered_detection[key] = detection[key]
         else:
             filtered_detection[key] = itemgetter(*filtered_list)(detection[key])
-
     return filtered_detection
 
 
 def cut_threshold(detection: dict, threshold: float = math.inf, count: int = math.inf):
     filtered_detection = dict()
+    if detection is None:
+        return None
+    elif not hasattr(detection["detection_scores"], "__iter__"):
+        if detection["detection_scores"] < threshold:
+            return None
+        else:
+            return detection
+
     score_list = [
         i for i, d in enumerate(detection["detection_scores"]) if d >= threshold
     ]
@@ -56,6 +66,9 @@ def get_object_patch(img: Image, predict: np.ndarray, **kwargs):
     height, width, _ = img.size
 
     patch_list = list()
+    if not predict:
+        return patch_list
+
     for box, cls, color in zip(
         predict["detection_boxes"], predict["detection_classes"], RANDOM_COLORS
     ):

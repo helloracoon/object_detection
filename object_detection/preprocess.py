@@ -7,7 +7,7 @@ manager = urllib3.PoolManager()
 
 
 class Image:
-    def __init__(self, path, stream: bool = False):
+    def __init__(self, path, stream: bool = False, raw=False):
         if isinstance(path, np.ndarray):
             self.array = path
         else:

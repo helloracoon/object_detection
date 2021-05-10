@@ -106,9 +106,9 @@ class TfDefaultDetector:
                     list_of_keypoint_ids.append(kv.id)
                 category["keypoints"] = keypoints
             categories.add(category)
-        self.category_map = dict(sorted(
-            {item.pop("id"): item for item in categories}.items()
-        ))
+        self.category_map = dict(
+            sorted({item.pop("id"): item for item in categories}.items())
+        )
         return list(categories)
 
     def predict(self, image: Image, use_name: bool = False) -> dict:
