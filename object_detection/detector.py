@@ -118,6 +118,8 @@ class TfDefaultDetector:
         input_tensor = input_tensor[tf.newaxis, ...]
 
         # input_tensor = np.expand_dims(image_np, 0)
+        if not self._model:
+            raise Exception('required model initialization')
         detections = self._model(input_tensor)
 
         num_detections = int(detections.pop("num_detections"))

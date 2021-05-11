@@ -31,9 +31,9 @@ class Capture:
                     continue
                 yield image
 
-    def play(self):
+    def play(self, skips=1):
 
-        for image in self._play():
+        for image in self._play(skips):
             cv2.imshow(self.path, image)
             if cv2.waitKey(self.delay) & 0xFF == ord("q"):
                 break
@@ -41,27 +41,25 @@ class Capture:
     def detection(
         self,
         detector: TfDefaultDetector,
-        threshold: float,
+        threshold: float = 0,
         skips: int = 1,
         filter_list: list = None,
     ) -> dict:
 
-        detect = dict()
         for image in self._play(skips):
             image = Image(image)
             time = self.vid.get(cv2.CAP_PROP_POS_MSEC)
             predict = detector.predict(image, use_name=True)
             predict = filter_predict(predict, filter_list)
             predict = cut_threshold(predict, threshold)
-            if predict is None or not predict['detection_classes']:
+            if not predict or not predict["detection_classes"]:
                 continue
-            detect[time] = predict
-        return detect
+            yield {time: predict}
 
     def detection_play(
         self,
         detector: TfDefaultDetector,
-        threshold: float,
+        threshold: float = 0,
         skips: int = 1,
         filter_list: list = None,
     ) -> None:

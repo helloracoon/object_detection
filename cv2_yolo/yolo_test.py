@@ -39,8 +39,12 @@ for yolo_file in [cfg, weights]:
     model_path[file_name] = file_path
 
 
-coco_names = manager.request('GET','https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names', preload_content=False)
-classes = [coco.decode('utf-8').rstrip() for coco in coco_names.readlines()]
+coco_names = manager.request(
+    "GET",
+    "https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names",
+    preload_content=False,
+)
+classes = [coco.decode("utf-8").rstrip() for coco in coco_names.readlines()]
 colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
 net = cv2.dnn.readNet(model_path.get("yolov3.weigths"), model_path.get("yolov3.cfg"))

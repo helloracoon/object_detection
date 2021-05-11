@@ -15,33 +15,34 @@ random.shuffle(RANDOM_COLORS)
 
 
 def filter_predict(detection: dict, name: list):
-    if name is None:
+    if not name:
         return detection
     filtered_detection = dict()
 
     filtered_list = [
         i for i, d in enumerate(detection["detection_classes"]) if d["name"] in name
     ]
-    if not filtered_detection:
-        return None
+    if not filtered_list:
+        return filtered_detection
 
     for key in detection.keys():
         if not hasattr(detection[key], "__getitem__"):
             filtered_detection[key] = detection[key]
         else:
-            filtered_detection[key] = itemgetter(*filtered_list)(detection[key])
+            filtered_detection[key] = [detection[key][index] for index in filtered_list]
+            # filtered_detection[key] = itemgetter(*filtered_list)(detection[key])
     return filtered_detection
 
 
 def cut_threshold(detection: dict, threshold: float = math.inf, count: int = math.inf):
     filtered_detection = dict()
-    if detection is None:
-        return None
-    elif not hasattr(detection["detection_scores"], "__iter__"):
-        if detection["detection_scores"] < threshold:
-            return None
-        else:
-            return detection
+    if not detection:
+        return filtered_detection
+    # elif not hasattr(detection["detection_scores"], "__iter__"):
+    #     if detection["detection_scores"] < threshold:
+    #         return filtered_detection
+    #     else:
+    #         return detection
 
     score_list = [
         i for i, d in enumerate(detection["detection_scores"]) if d >= threshold
@@ -61,13 +62,16 @@ def cut_threshold(detection: dict, threshold: float = math.inf, count: int = mat
     return filtered_detection
 
 
-def get_object_patch(img: Image, predict: np.ndarray, **kwargs):
+def get_object_patch(img: Image, predict: dict, **kwargs):
 
     height, width, _ = img.size
 
     patch_list = list()
     if not predict:
         return patch_list
+    # if not isinstance(predict['detection_scores'],tuple):
+    #     for key in predict.keys():
+    #         predict[key] = tuple(predict[key])
 
     for box, cls, color in zip(
         predict["detection_boxes"], predict["detection_classes"], RANDOM_COLORS
@@ -92,7 +96,7 @@ def get_object_patch(img: Image, predict: np.ndarray, **kwargs):
     return patch_list
 
 
-def plot_object_detection(img: Image, predict: np.ndarray, **kwargs):
+def plot_object_detection(img: Image, predict: dict, **kwargs):
 
     fig, ax = plt.subplots(**kwargs)
     ax.imshow(img.array)
